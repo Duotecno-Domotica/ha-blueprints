@@ -1,0 +1,42 @@
+blueprint:
+  name: Duotecno_lights_on_off_dim_enkele_richting
+  description: With this blueprint, you can turn your lights on and off and dim them in one direction
+  domain: automation
+  author: duotecno
+  input:
+    light_target:
+      name: Master light
+      selector:
+        entity:
+          domain:
+            - light
+    slave_target:
+      name: Slave lights
+      selector:
+        entity:
+          multiple: true
+          domain:
+            - light
+
+trigger:
+  - entity_id:
+      - !input light_target
+    platform: state
+condition: []
+
+action:
+  - service: >-
+      {% if trigger.to_state.state == "on" %} light.turn_on {% elif
+      trigger.to_state.state == "off" %} light.turn_off {% endif %}
+    target:
+      entity_id: !input slave_target
+
+  - condition: state
+    entity_id: !input slave_target
+    state: "on"
+
+  - service: light.turn_on
+    data:
+      brightness: "{{ trigger.to_state.attributes.brightness }}"
+    target:
+      entity_id: !input slave_target

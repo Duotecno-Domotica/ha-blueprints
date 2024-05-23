@@ -1,0 +1,61 @@
+blueprint:
+  name: Duotecno_screens_synchroniseren_master_slave_enkele_richting
+  description: "With this blueprint, you will synchronize your screens for going up, down, and stop."
+  domain: automation
+  author: Duotecno
+  input:
+    cover_target:
+      name: Master screen
+      selector:
+        entity:
+          domain:
+            - cover
+    cover_targett:
+      name: Slave screen
+      selector:
+        entity:
+          domain:
+            - cover
+
+trigger:
+  - platform: state
+    entity_id: !input cover_target
+    to: "opening"
+  - platform: state
+    entity_id: !input cover_target
+    to: "closing"
+  - platform: state
+    entity_id: !input cover_target
+    to: "open"
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: !input cover_target
+            state: "opening"
+        sequence:
+          - service: cover.open_cover
+            target:
+              entity_id: !input cover_targett
+            data: {}
+      - conditions:
+          - condition: state
+            entity_id: !input cover_target
+            state: "closing"
+        sequence:
+          - service: cover.close_cover
+            target:
+              entity_id: !input cover_targett
+            data: {}
+      - conditions:
+          - condition: state
+            entity_id: !input cover_target
+            state: "open"
+        sequence:
+          - service: cover.stop_cover
+            target:
+              entity_id: !input cover_targett
+            data: {}
+
+mode: single

@@ -1,0 +1,50 @@
+blueprint:
+  name: Duotecno_relais_enkele_richting
+  domain: automation
+  author: Duotecno
+  input:
+    switch1_entity:
+      name: master relais
+      selector:
+        entity:
+          domain:
+            - switch
+    switch2_entity:
+      name: slave relais
+      selector:
+        entity:
+          multiple: true
+          domain:
+            - switch
+
+description: ""
+trigger:
+  - platform: state
+    entity_id: !input switch1_entity
+    to: "on"
+  - platform: state
+    entity_id: !input switch1_entity
+    to: "off"
+condition: []
+action:
+  - if:
+      - condition: state
+        entity_id: !input switch1_entity
+        state: "on"
+    then:
+      - service: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: !input switch2_entity
+  - if:
+      - condition: state
+        entity_id: !input switch1_entity
+        state: "off"
+    then:
+      - service: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: !input switch2_entity
+mode: single
